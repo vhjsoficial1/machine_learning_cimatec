@@ -137,7 +137,7 @@ def create_dataset(orders, items, customers):
         customers[["customer_id", "customer_city", "customer_state"]],
         on="customer_id",
         how="left",
-        validate="may_to_one",
+        validate="many_to_one",
     )
 
     return data
