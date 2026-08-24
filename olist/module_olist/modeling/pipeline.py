@@ -93,7 +93,3 @@ def create_lightgbm_pipeline() -> Pipeline:
         steps=[("preprocessor", preprocessor),
                ("model", model)]
     )
-
-    # qual nome de commit voce daria para esse arquivo e o arquivo split?
-Para o arquivo `pipeline.py`, um nome de commit apropriado poderia ser: "Implementação de pipelines de pré-processamento e modelos de classificação".
-Para o arquivo `split.py`, um nome de commit apropriado poderia ser: "Implementação da função de divisão de dados em treino e teste com estratificação".
