@@ -16,7 +16,7 @@ from lightgbm import LGBMClassifier
 # lightgbm é uma biblioteca de aprendizado de máquina baseada em gradient boosting, que utiliza uma abordagem de histogramas para acelerar o treinamento e reduzir o uso de memória. Ele é especialmente eficiente em grandes conjuntos de dados e é capaz de lidar com variáveis categóricas diretamente, sem a necessidade de codificação one-hot.
 
 NUMERICAL_FEATURES = [
-    "promise_days",
+    "promised_days",
     "item_count",
     "seller_count",
     "total_price",
