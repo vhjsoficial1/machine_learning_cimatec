@@ -5,7 +5,7 @@ FEATURES = [
     "purchase_hour",
     "purchase_weekday",
     "purchase_month",
-    "promise_days",
+    "promised_days",
     "item_count",
     "seller_count",
     "total_price",
