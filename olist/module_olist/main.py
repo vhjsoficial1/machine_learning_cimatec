@@ -1,31 +1,134 @@
-from module_olist.config import INTERIM_DATA_DIR, RAW_DATA_DIR
-from module_olist.dataset import create_dataset, load_data, save_dataset
+from module_olist.config import (
+    RAW_DATA_DIR,
+    INTERIM_DATA_DIR,
+    MODELS_DIR,
+)
+
+from module_olist.dataset import (
+    load_data,
+    create_dataset,
+    save_dataset,
+)
+
 from module_olist.features import create_features
-from module_olist.modeling.evaluate import evaluate_models
+
 from module_olist.modeling.split import split_data
-from module_olist.modeling.train import train_model
 
-def main() -> None:
-    orders_path = RAW_DATA_DIR / "olist_orders_dataset.csv"
-    items_path = RAW_DATA_DIR / "olist_order_items_dataset.csv"
-    customers_path = RAW_DATA_DIR / "olist_customers_dataset.csv"
+from module_olist.modeling.train import (
+    train_model,
+)
 
-    orders, items, customers = load_data(
-        orders_path=orders_path,
-        items_path=items_path,
-        customers_path=customers_path,
+from module_olist.modeling.evaluate import (
+    evaluate_model,
+)
+
+from module_olist.modeling.cross_validation import (
+    cross_validate_models,
+)
+
+from loguru import logger
+
+
+def main():
+
+    logger.info(
+        "Iniciando preparação do dataset..."
     )
 
-    data = create_dataset(orders=orders, items=items, customers=customers)
+    orders, items, customers = load_data(
+        orders_path=(
+            RAW_DATA_DIR
+            / "olist_orders_dataset.csv"
+        ),
+        items_path=(
+            RAW_DATA_DIR
+            / "olist_order_items_dataset.csv"
+        ),
+        customers_path=(
+            RAW_DATA_DIR
+            / "olist_customers_dataset.csv"
+        ),
+    )
+
+    data = create_dataset(
+        orders,
+        items,
+        customers,
+    )
+
     data = create_features(data)
 
-    INTERIM_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = INTERIM_DATA_DIR / "olist_interim_dataset.csv"
-    save_dataset(dataset=data, output_path=output_path)
+    save_dataset(
+        data,
+        INTERIM_DATA_DIR
+        / "orders_dataset_refined.csv",
+    )
 
-    X_train, X_test, y_train, y_test = split_data(data)
-    models = train_model(X_train=X_train, y_train=y_train)
-    evaluate_models(models=models, X_test=X_test, y_test=y_test)
+    # =============================================
+    # TRAIN / TEST
+    # =============================================
+
+    X_train, X_test, y_train, y_test = (
+        split_data(data)
+    )
+
+    # =============================================
+    # CROSS VALIDATION
+    # Seleciona modelo + threshold
+    # =============================================
+
+    (
+        best_model_name,
+        best_threshold,
+    ) = cross_validate_models(
+        X_train,
+        y_train,
+    )
+
+    logger.info(
+        f"Modelo escolhido: "
+        f"{best_model_name}"
+    )
+
+    logger.info(
+        f"Threshold escolhido: "
+        f"{best_threshold:.2f}"
+    )
+
+    # =============================================
+    # TREINAMENTO FINAL
+    # =============================================
+
+    model = train_model(
+        model_name=best_model_name,
+        threshold=best_threshold,
+        X_train=X_train,
+        y_train=y_train,
+        model_path=(
+            MODELS_DIR
+            / "best_model.joblib"
+        ),
+        metadata_path=(
+            MODELS_DIR
+            / "metadata.json"
+        ),
+    )
+
+    # =============================================
+    # TESTE FINAL
+    # =============================================
+
+    evaluate_model(
+        model=model,
+        model_name=best_model_name,
+        X_test=X_test,
+        y_test=y_test,
+        threshold=best_threshold,
+    )
+
+    logger.success(
+        "Pipeline executado com sucesso."
+    )
 
 
 if __name__ == "__main__":
