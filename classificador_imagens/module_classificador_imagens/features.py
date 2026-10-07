@@ -1,29 +1,24 @@
+"""Pré-processamento de imagens e rótulos."""
 from pathlib import Path
 
-from loguru import logger
-from tqdm import tqdm
-import typer
+import numpy as np
+from tensorflow.keras.utils import img_to_array, load_img
 
-from module_classificador_imagens.config import PROCESSED_DATA_DIR
-
-app = typer.Typer()
+from module_classificador_imagens.config import IMAGE_SHAPE
 
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Generating features from dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Features generation complete.")
-    # -----------------------------------------
+def normalize_images(images: np.ndarray) -> np.ndarray:
+    """Converte para float32 e normaliza os pixels para o intervalo [0, 1]."""
+    return images.astype("float32") / 255.0
 
 
-if __name__ == "__main__":
-    app()
+def flatten_labels(labels: np.ndarray) -> np.ndarray:
+    """O CIFAR-10 entrega os rótulos como coluna (N, 1); aqui viram (N,)."""
+    return labels.flatten()
+
+
+def load_image_file(path: Path) -> np.ndarray:
+    """Carrega uma imagem do disco pronta para o modelo: shape (1, 32, 32, 3)."""
+    img = load_img(path, target_size=IMAGE_SHAPE[:2])
+    array = normalize_images(img_to_array(img))
+    return np.expand_dims(array, axis=0)

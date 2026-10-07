@@ -29,6 +29,7 @@ dependencies = [
     "python-dotenv",
     "ruff",
     "scikit-learn",
+    "tensorflow>=2.21.0",
     "tqdm",
     "typer",
 ]
