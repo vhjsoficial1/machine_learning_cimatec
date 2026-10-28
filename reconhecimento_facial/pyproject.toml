@@ -1,0 +1,52 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "module_reconhecimento_facial"
+version = "0.0.1"
+description = "Pequeno problema para reconhecimento de faces"
+authors = [
+  { name = "vitu_lindu" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+dependencies = [
+    "deepface>=0.0.101",
+    "ipython",
+    "jupyterlab",
+    "loguru",
+    "matplotlib",
+    "mkdocs",
+    "notebook",
+    "numpy",
+    "opencv-python>=5.0.0.93",
+    "pandas",
+    "pip",
+    "pytest",
+    "python-dotenv",
+    "ruff",
+    "scikit-learn",
+    "tf-keras>=2.21.0",
+    "tqdm",
+    "typer",
+]
+requires-python = "==3.12.6"
+
+
+[tool.ruff]
+line-length = 99
+src = ["module_reconhecimento_facial"]
+include = ["pyproject.toml", "module_reconhecimento_facial/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["module_reconhecimento_facial"]
+force-sort-within-sections = true
+
